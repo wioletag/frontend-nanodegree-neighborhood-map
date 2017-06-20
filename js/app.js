@@ -1,125 +1,6 @@
 function Model() {
-  this.locations = [{
-      title: 'Handlebar',
-      id: '40f08300f964a5204b0a1fe3',
-      location: {
-        lat: 41.910175,
-        lng: -87.68529
-      },
-      keys: [
-        "bar", "food", "restaurant"
-      ]
-    },
-    {
-      title: 'Stan\'s Donuts & Coffee',
-      id: '52f2eebd498ea23d1a8d16d5',
-      location: {
-        lat: 41.909976,
-        lng: -87.677554
-      },
-      keys: ["food", "bakery", "cafe"]
-    },
-    {
-      title: 'The Violet Hour',
-      id: '49ba99c9f964a5207e531fe3',
-      location: {
-        lat: 41.909086,
-        lng: -87.677829
-      },
-      keys: ["bar"]
-    },
-    {
-      title: 'Native Foods Cafe',
-      id: '4e383e35d4c0dc7ad2ee1415',
-      location: {
-        lat: 41.908824,
-        lng: -87.675274
-      },
-      keys: ["food", "restaurant"]
-    },
-    {
-      title: 'Parlor Pizza Bar',
-      id: '575b49f5498e2d45df7b1399',
-      location: {
-        lat: 41.903404,
-        lng: -87.673424
-      },
-      keys: ["bar", "food", "restaurant"]
-    },
-    {
-      title: 'Dimo\'s Pizza',
-      id: '51eee947498e5566f01655c0',
-      location: {
-        lat: 41.911033,
-        lng: -87.677328
-      },
-      keys: ["food", "restaurant"]
-    },
-    {
-      title: 'Lou Malnati\'s Pizzeria',
-      id: '4b42698af964a52071d325e3',
-      location: {
-        lat: 41.908878,
-        lng: -87.677965
-      },
-      keys: ["food", "restaurant"]
-    },
-    {
-      title: 'Big Star',
-      id: '4adbf2bbf964a520242b21e3',
-      location: {
-        lat: 41.909172,
-        lng: -87.677105
-      },
-      keys: ["bar", "food", "restaurant"]
-    },
-    {
-      title: 'Whiskey Business',
-      id: '56a0503e498e82754e49607e',
-      location: {
-        lat: 41.906752,
-        lng: -87.671554
-      },
-      keys: ["bar", "food", "restaurant"]
-    },
-    {
-      title: 'Zakopane',
-      id: '40b28c80f964a5203ffd1ee3',
-      location: {
-        lat: 41.903428,
-        lng: -87.671315
-      },
-      keys: ["bar"]
-    },
-    {
-      title: 'Wicker Park',
-      id: '4ae49d01f964a520519c21e3',
-      location: {
-        lat: 41.908049,
-        lng: -87.676738
-      },
-      keys: ["park"]
-    },
-    {
-      title: 'Bangers & Lace',
-      id: '4c5847e030d82d7ff8b4db62',
-      location: {
-        lat: 41.903445,
-        lng: -87.670233
-      },
-      keys: ["bar"]
-    },
-    {
-      title: 'The Fifty/50',
-      id: '49e55491f964a520be631fe3',
-      location: {
-        lat: 41.902895,
-        lng: -87.679063
-      },
-      keys: ["bar", "food", "restaurant"]
-    }
-  ];
   this.map = null;
+  this.infowindow = null;
 }
 
 var model = new Model();
@@ -130,7 +11,6 @@ var Location = function(data) {
   this.location = data.location;
   this.keys = data.keys;
   this.visible = true;
-  this.windowOpened = false;
   this.marker = new google.maps.Marker({
     map: model.map,
     position: this.location,
@@ -138,7 +18,6 @@ var Location = function(data) {
     animation: google.maps.Animation.DROP,
     visible: true
   });
-  this.infowindow = new google.maps.InfoWindow();
 };
 
 function ViewModel() {
@@ -146,14 +25,18 @@ function ViewModel() {
   this.locationList = ko.observableArray([]);
   this.filter = ko.observable("");
 
-  // Function to show all markers on map
+  /**
+   * Function to show all markers on map
+   */
   this.showAllMarkers = function() {
     self.locationList().forEach(function(location) {
       location.marker.setVisible(true);
     });
   };
 
-  // Function to filter locations in the list
+  /**
+   * Function to filter locations in the list
+   */
   this.filteredItems = ko.computed(function() {
     var filter = self.filter().toLowerCase();
     if (!filter) {
@@ -167,28 +50,15 @@ function ViewModel() {
           return true;
         } else {
           location.marker.setVisible(false);
-          // Close infoWindow for this marker if opened
-          if (location.windowOpened) {
-            location.infowindow.close();
-            location.windowOpened = false;
-          }
           return false;
         }
       });
     }
   }, this);
 
-  // Function to close any open infoWindow
-  this.closeInfoWindows = function() {
-    self.locationList().forEach(function(location) {
-      if (location.windowOpened) {
-        location.infowindow.close();
-        location.windowOpened = false;
-      }
-    });
-  };
-
-  // Function to show infoWindow for chosen location
+  /**
+   * Function to show infoWindow for chosen location
+   */
   this.showInfoWindow = function(location) {
     var clientId = 'OBCNKT2ROUPNFWFVVP1QYEYMRRNNDRU2AR52YOZ5FRJCI13U';
     var clientSecret = '3DYBBVMJHUN4YT4HRFJO1P5AE1I2RK14PZ0LWWQCAFDA225R';
@@ -197,7 +67,6 @@ function ViewModel() {
     var venue_id = location.id;
     var url = base_url + '/' + venue_id + '?client_id=' + clientId +
       '&client_secret=' + clientSecret + '&v=' + version;
-    var content = '<h5>' + location.title + '</h5>';
 
     // Make Ajax call to Foursquare API and populate location's infoWindow
     $.ajax({
@@ -205,36 +74,45 @@ function ViewModel() {
       dataType: 'jsonp',
       success: function(data) {
         var result = data.response.venue;
-        content += '<div class="info"><p>' + result.location.formattedAddress[
-          0] + '</p>';
-        content += '<p>' + result.location.formattedAddress[1] + '</p>';
-        content += '<p>' + result.location.formattedAddress[2] + '</p>';
-        content += '<p>' + result.rating + " (" + result.ratingSignals +
-          " ratings)" + '</p>';
-        content += '<p><a href="' + result.url + '" target="_blank">' +
-          result.url + '</a></p>';
-        content +=
-          '<p>Source: <a href="https://foursquare.com/" target="_blank">Foursquare</a></p></div>';
-        location.infowindow.setContent(content);
+        var content = self.getContent(location.title, result);
+        model.infowindow.setContent(content);
+        model.infowindow.open(map, location.marker);
       },
       error: function() {
         content += '<p>Failed to get Foursquare data.</p>';
-        location.infowindow.setContent(content);
+        model.infowindow.setContent(content);
+        model.infowindow.open(map, location.marker);
       }
     });
-
-    // Close any open infoWindow before opening a new one
-    self.closeInfoWindows();
-
-    // Open infoWindow for chosen location
-    location.infowindow.open(map, location.marker);
-    location.windowOpened = true;
 
     // Bounce the marker
     self.bounceMarker(location.marker);
   };
 
-  // Function to initialize map
+  /**
+   * Function to create content for marker's infoWindow
+   */
+  this.getContent = function(locationTitle, result) {
+    var content, address, rating, ratingSignals, url, source;
+    var title = '<h5>' + locationTitle + '</h5>';
+
+    // Set variables based on output from Foursquare API
+    address = (result.location.formattedAddress && result.location.formattedAddress.length) ? (result.location.formattedAddress[
+          0] + '</br>' + result.location.formattedAddress[1] + '</br>' + result.location.formattedAddress[2] + '</p>') : "No address available"
+    rating = result.rating ? result.rating : "No rating available";
+    rating += result.ratingSignals ? " (" + result.ratingSignals + " ratings)" : "";
+    url = result.url ? '<a href="' + result.url + '" target="_blank">' + result.url + '</a>' : 'No url available';
+    source = 'Source: <a href="https://foursquare.com/" target="_blank">Foursquare</a>';
+
+    // Set content for infoWindow
+    content = title + '<div class="info"><p>' + address + '</p><p>' + rating + '</p><p>' + url + '</p><p>' + source + '</p><p></div>';
+
+    return content;
+  };
+
+  /**
+   * Success callback for Google Map API request
+   */
   this.initMap = function() {
     // Map style from https://snazzymaps.com/
     var styles = [{
@@ -415,25 +293,48 @@ function ViewModel() {
       styles: styles
     });
 
-    // Create locations
-    model.locations.forEach(function(location) {
-      var newLoc = new Location(location);
-      // Add click event listener to marker
-      newLoc.marker.addListener('click', function() {
-        self.showInfoWindow(newLoc);
-      });
+    // Create infoWindow
+    model.infowindow = new google.maps.InfoWindow();
 
-      // Store in the location list
-      self.locationList.push(newLoc);
+    // Get location data from json file
+    $.ajax({
+      url: '/../data.json',
+      dataType: 'json',
+      success: function(data) {
+        data.locations.forEach(function(location) {
+          var newLoc = new Location(location);
+
+          // Add click event listener to marker
+          newLoc.marker.addListener('click', function() {
+            self.showInfoWindow(newLoc);
+          });
+
+          // Store in the location list
+          self.locationList.push(newLoc);
+        });
+      },
+      error: function() {
+        $('.navbar-nav').append("<div class='error'>Error reading location data.</div>");
+      }
     });
   };
 
-  // Function to bounce marker on the map
+  /**
+   * Function to bounce marker on the map
+   */
   this.bounceMarker = function(marker) {
     marker.setAnimation(google.maps.Animation.BOUNCE);
     setTimeout(function() {
       marker.setAnimation(null);
-    }, 750);
+    }, 700);
+  };
+
+  /**
+   * Error callback for Google Map API request
+   */
+  this.mapError = function() {
+    // Error handling
+    $('.map-container').prepend("<div class='error'>Google Map API failed to load.</div>");
   };
 }
 
