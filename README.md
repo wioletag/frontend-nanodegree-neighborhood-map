@@ -14,7 +14,7 @@ This is a Neighborhood Map project that shows places in one of my favorite neigh
     This will set up a local HTTP Server.
   * Open a browser and type the following address:
     ```
-    http://127.0.0.1:8000
+    localhost:8080
     ```
 
 ### **Search input filters**
