@@ -6,13 +6,12 @@ This is a Neighborhood Map project that shows places in one of my favorite neigh
 ### **Usage**
 - Use the app [here](https://wioletag.github.io/frontend-nanodegree-neighborhood-map/index.html).
 - Clone or download this repository.
-  * Open up a terminal and type:
+  * Open up a terminal and type following commands to set up a local HTTP Server:
     ```
     cd /home/somedir
     python -m SimpleHTTPServer 8080
     ```
     /home/somedir is the directory of downloaded/cloned project with index.html page.
-    This will set up a local HTTP Server.
   * Open a browser and type the following address:
     ```
     localhost:8080
