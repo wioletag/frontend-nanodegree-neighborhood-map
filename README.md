@@ -11,6 +11,7 @@ This is a Neighborhood Map project that shows places in one of my favorite neigh
     cd /home/somedir
     python -m SimpleHTTPServer 8080
     ```
+    /home/somedir is the directory of downloaded/cloned project with index.html page.
     This will set up a local HTTP Server.
   * Open a browser and type the following address:
     ```
