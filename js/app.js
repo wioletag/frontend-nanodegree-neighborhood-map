@@ -24,6 +24,8 @@ function ViewModel() {
   var self = this;
   this.locationList = ko.observableArray([]);
   this.filter = ko.observable("");
+  this.mapErrorMsg = ko.observable();
+  this.locErrorMsg = ko.observable();
 
   /**
    * Function to show all markers on map
@@ -68,6 +70,7 @@ function ViewModel() {
     var venue_id = location.id;
     var url = base_url + '/' + venue_id + '?client_id=' + clientId +
       '&client_secret=' + clientSecret + '&v=' + version;
+    var content ="";
 
     // Make Ajax call to Foursquare API and populate location's infoWindow
     $.ajax({
@@ -75,12 +78,13 @@ function ViewModel() {
       dataType: 'jsonp',
       success: function(data) {
         var result = data.response.venue;
-        var content = self.getContent(location.title, result);
+        content = self.getContent(location.title, result);
         model.infowindow.setContent(content);
         model.infowindow.open(map, location.marker);
       },
       error: function() {
-        content += '<p>Failed to get Foursquare data.</p>';
+        // Error handling
+        content = '<p>Failed to get Foursquare data.</p>';
         model.infowindow.setContent(content);
         model.infowindow.open(map, location.marker);
       }
@@ -94,19 +98,21 @@ function ViewModel() {
    * Function to create content for marker's infoWindow
    */
   this.getContent = function(locationTitle, result) {
-    var content, address, rating, url, source;
-    var title = '<h5>' + locationTitle + '</h5>';
+    var address, rating, url, source;
+    var content = '<h5>' + locationTitle + '</h5>';
 
     // Set variables based on output from Foursquare API
-    address = (result.location.formattedAddress && result.location.formattedAddress.length) ? (result.location.formattedAddress[
+    if (result){
+      address = (result.location.formattedAddress && result.location.formattedAddress.length) ? (result.location.formattedAddress[
           0] + '</br>' + result.location.formattedAddress[1] + '</br>' + result.location.formattedAddress[2] + '</p>') : "No address available";
-    rating = result.rating ? result.rating : "No rating available";
-    rating += result.ratingSignals ? " (" + result.ratingSignals + " ratings)" : "";
-    url = result.url ? '<a href="' + result.url + '" target="_blank">' + result.url + '</a>' : 'No url available';
-    source = 'Source: <a href="https://foursquare.com/" target="_blank">Foursquare</a>';
+      rating = result.rating ? result.rating : "No rating available";
+      rating += result.ratingSignals ? " (" + result.ratingSignals + " ratings)" : "";
+      url = result.url ? '<a href="' + result.url + '" target="_blank">' + result.url + '</a>' : 'No url available';
+      source = 'Source: <a href="https://foursquare.com/" target="_blank">Foursquare</a>';
 
-    // Set content for infoWindow
-    content = title + '<div class="info"><p>' + address + '</p><p>' + rating + '</p><p>' + url + '</p><p>' + source + '</p><p></div>';
+      // Set content for infoWindow
+      content += '<div class="info"><p>' + address + '</p><p>' + rating + '</p><p>' + url + '</p><p>' + source + '</p><p></div>';
+    }
 
     return content;
   };
@@ -115,174 +121,6 @@ function ViewModel() {
    * Success callback for Google Map API request
    */
   this.initMap = function() {
-    // Map style from https://snazzymaps.com/
-    var styles = [{
-        "featureType": "water",
-        "stylers": [{
-          "color": "#19a0d8"
-        }]
-      },
-      {
-        "featureType": "administrative",
-        "elementType": "labels.text.stroke",
-        "stylers": [{
-            "color": "#ffffff"
-          },
-          {
-            "weight": 6
-          }
-        ]
-      },
-      {
-        "featureType": "administrative",
-        "elementType": "labels.text.fill",
-        "stylers": [{
-          "color": "#e85113"
-        }]
-      },
-      {
-        "featureType": "road.highway",
-        "elementType": "geometry.stroke",
-        "stylers": [{
-            "color": "#efe9e4"
-          },
-          {
-            "lightness": -40
-          }
-        ]
-      },
-      {
-        "featureType": "road.arterial",
-        "elementType": "geometry.stroke",
-        "stylers": [{
-            "color": "#efe9e4"
-          },
-          {
-            "lightness": -20
-          }
-        ]
-      },
-      {
-        "featureType": "road",
-        "elementType": "labels.text.stroke",
-        "stylers": [{
-          "lightness": 100
-        }]
-      },
-      {
-        "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [{
-          "lightness": -100
-        }]
-      },
-      {
-        "featureType": "road.highway",
-        "elementType": "labels.icon"
-      },
-      {
-        "featureType": "landscape",
-        "elementType": "labels",
-        "stylers": [{
-          "visibility": "off"
-        }]
-      },
-      {
-        "featureType": "landscape",
-        "stylers": [{
-            "lightness": 20
-          },
-          {
-            "color": "#efe9e4"
-          }
-        ]
-      },
-      {
-        "featureType": "landscape.man_made",
-        "stylers": [{
-          "visibility": "off"
-        }]
-      },
-      {
-        "featureType": "water",
-        "elementType": "labels.text.stroke",
-        "stylers": [{
-          "lightness": 100
-        }]
-      },
-      {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [{
-          "lightness": -100
-        }]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [{
-          "hue": "#11ff00"
-        }]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "labels.text.stroke",
-        "stylers": [{
-          "lightness": 100
-        }]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "labels.icon",
-        "stylers": [{
-            "hue": "#4cff00"
-          },
-          {
-            "saturation": 58
-          }
-        ]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [{
-            "visibility": "on"
-          },
-          {
-            "color": "#f0e4d3"
-          }
-        ]
-      },
-      {
-        "featureType": "road.highway",
-        "elementType": "geometry.fill",
-        "stylers": [{
-            "color": "#efe9e4"
-          },
-          {
-            "lightness": -25
-          }
-        ]
-      },
-      {
-        "featureType": "road.arterial",
-        "elementType": "geometry.fill",
-        "stylers": [{
-            "color": "#efe9e4"
-          },
-          {
-            "lightness": -10
-          }
-        ]
-      },
-      {
-        "featureType": "poi",
-        "elementType": "labels",
-        "stylers": [{
-          "visibility": "simplified"
-        }]
-      }
-    ];
 
     // Create new map
     model.map = new google.maps.Map(document.getElementById('map'), {
@@ -290,9 +128,11 @@ function ViewModel() {
         lat: 41.908803,
         lng: -87.679598
       },
-      zoom: 15,
-      styles: styles
+      zoom: 15
     });
+
+    // Set map style
+    self.setMapStyle();
 
     // Create infoWindow
     model.infowindow = new google.maps.InfoWindow();
@@ -315,10 +155,31 @@ function ViewModel() {
         });
       },
       error: function() {
-        $('.navbar-nav').append("<div class='error'>Error reading location data.</div>");
+        // Error handling
+        self.locErrorMsg("Error reading location data.")
       }
     });
   };
+
+  /**
+   * Function to read map style from json file
+   */
+  this.setMapStyle = function() {
+    $.ajax({
+      url: '/../mapStyle.json',
+      dataType: 'json',
+      success: function(data) {
+        console.log(data.style);
+        model.map.setOptions({styles: data.style});
+      },
+      error: function() {
+        // Error handling
+        // If style fails to load, we still want to display map with the default still so no error is thrown.
+        // Only a message to the console is logged.
+        console.log("Map style failed to load. Default style will be used.");
+      }
+    });
+  }
 
   /**
    * Function to bounce marker on the map
@@ -335,7 +196,7 @@ function ViewModel() {
    */
   this.mapError = function() {
     // Error handling
-    $('.map-container').prepend("<div class='error'>Google Map API failed to load.</div>");
+   self.mapErrorMsg("Google Map API failed to load.");
   };
 }
 

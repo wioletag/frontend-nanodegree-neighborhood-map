@@ -38,10 +38,16 @@ body {
   color: #e85113 ! important;
 }
 
-.error {
+.mapError {
   font-size: 20px;
-  text-align: center;
+  padding: 10px;
+  color: #FF0000;
+}
+
+.locError {
+  font-size: 18px;
   padding-top: 15px;
+  text-align: center;
   color: #FF0000;
 }
 
