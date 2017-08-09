@@ -5,6 +5,7 @@ This is a Neighborhood Map project that shows places in one of my favorite neigh
 
 ### **Usage**
 - Use the app [here](https://wioletag.github.io/frontend-nanodegree-neighborhood-map/index.html).
+  or
 - Clone or download this repository.
   * Open up a terminal and type following commands to set up a local HTTP Server:
     ```
