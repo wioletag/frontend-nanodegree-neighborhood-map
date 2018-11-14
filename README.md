@@ -1,8 +1,6 @@
 Udacity Frontend Nanodegree Neighborhood Map
 =========================================
 ### **Overview**
-This is a Neighborhood Map project that shows places in one of my favorite neighborhoods in Chicago - Wicker Park. This project utilizes Google Map and Foursquare APIs.
-
 A single-page web application featuring a Google Map of Wicker Park neighborhood in Chicago.
 Application functionalities include map markers to identify locations, a search function to easily discover these locations, a list view to support simple browsing of all locations and when selected, additional information about a location is presented from the FourSquare API.
 Technologies used: HTML5, CSS, KnockoutJS, Bootstrap, AJAX, Google Map and Foursquare APIs.
